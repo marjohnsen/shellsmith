@@ -91,7 +91,7 @@
     setup_nvim_pyenv
     ```
 
-3. **Execute ShellSMith**
+3. **Execute ShellSmith:**
 
     ```bash
     ./ShellSMith.sh
