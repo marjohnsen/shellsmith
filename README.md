@@ -90,3 +90,9 @@
     setup_lazyvim
     setup_nvim_pyenv
     ```
+
+3. **Execute ShellSMith**
+
+    ```bash
+    ./ShellSMith.sh
+    ```
