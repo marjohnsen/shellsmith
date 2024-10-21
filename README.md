@@ -12,7 +12,7 @@
 
 - **Centralized Dotfile Management**: Efficiently manage dotfiles by symlinking them from a centralized location. The `safe_symlink` function ensures secure linking, preventing overwriting of existing files, and providing a reliable solution for maintaining consistent system configurations.
 
-## Application Structure
+## Repo Structure
 
 - **`apps/`**: Directory to place user-defined installation scripts.
 
