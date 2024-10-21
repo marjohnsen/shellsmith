@@ -18,8 +18,6 @@
 
   - **`packages.sh`**: Positioned to be executed first (all apps depend on it by default). It can be used to install utilities like `curl` early on.
 
-  - **`apps/kitty.sh.example`**: A template to help users write their own installation scripts.
-
 - **`dotfiles/`**: Central repository for user configuration files. Use `safe_symlink` to safely link dotfiles to their appropriate location.
   
 - **`misc/`**: Houses additional scripts or files, such as themes, that do not fall under applications or dotfiles.
