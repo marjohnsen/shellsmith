@@ -41,7 +41,7 @@
 
    ```bash
     #!/bin/bash
-    # Dependencies are read from the first line starting with double dash.
+    # Dependencies are read from the first line starting with double slash.
     # In this case, the dependency handler will make sure apps/pyenv.sh and apps/node.sh
     # are installed before executing this script
     // pyenv node
