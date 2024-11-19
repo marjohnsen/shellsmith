@@ -34,7 +34,7 @@ safe_symlink() {
   fi
 }
 
-mason_build_and_ninja_install() {
+meson_build_and_ninja_install() {
   local main_repo_info="$1"
   shift
   local build_path name repo_url git_tag
