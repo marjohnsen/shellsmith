@@ -1,26 +1,24 @@
 #!/usr/bin/env bash
 
-APPS_DIR="${SHELLSMITH_APPS_DIR:-$HOME/.config/.shellsmith/apps}"
+SHELLSMITH_DIR="${SHELLSMITH_ROOT:-$HOME/.config/.shellsmith}"
 SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 APPS=()
 
-if [[ ! -d "$APPS_DIR" ]]; then
-  echo "Error: Apps directory '$APPS_DIR' is missing."
-  echo "Create it with: mkdir -p '$HOME/.config/.shellsmith/apps'"
-  echo "Or set SHELLSMITH_APPS_DIR in your shell configuration."
+if [[ ! -d "$SHELLSMITH_DIR/apps" ]]; then
+  echo "Error: Apps directory '$SHELLSMITH_DIR/apps' is missing."
+  echo "Create it with: mkdir -p '$SHELLSMITH_DIR/apps'"
   exit 1
 fi
 
 source "$SCRIPT_DIR/src/app_handler.sh"
 source "$SCRIPT_DIR/src/dependency_handler.sh"
 source "$SCRIPT_DIR/src/app_installer.sh"
-
-app_handler APPS_DIR APPS
+app_handler SHELLSMITH_DIR APPS
 
 if [[ "${#APPS[@]}" -eq 0 ]]; then
   echo "No applications were selected. Exiting..."
   exit 1
 fi
 
-dependency_handler APPS_DIR APPS
-app_installer APPS_DIR "${APPS[@]}"
+dependency_handler SHELLSMITH_DIR APPS
+app_installer SHELLSMITH_DIR "${APPS[@]}"

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-APPS_DIR="$1" && shift
+SHELLSMITH_DIR="$1" && shift
 
 # Load dependencies from the app script
 load_dependencies() {
@@ -28,7 +28,7 @@ resolve_app() {
   processing_apps+=("$app")
 
   local dep_array
-  IFS=' ' read -r -a dep_array <<<"$(load_dependencies "./$APPS_DIR/$app.sh")"
+  IFS=' ' read -r -a dep_array <<<"$(load_dependencies "./$SHELLSMITH_DIR/apps/$app.sh")"
   for dep in "${dep_array[@]}"; do
     read -r -a resolved_apps <<<"$(resolve_app "$dep" resolved_apps[@] processing_apps[@])"
   done

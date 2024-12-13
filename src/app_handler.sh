@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 
-APPS_DIR="$1" && shift
+SHELLSMITH_DIR="$1" && shift
 
 # List available apps by reading .sh files in the ./apps directory
 list_apps() {
   local apps=()
-  for app in "$APPS_DIR"/*.sh; do
+  for app in "$SHELLSMITH_DIR"/apps/*.sh; do
     apps+=("$(basename "$app" .sh)")
   done
   printf "%s\n" "${apps[@]}"
