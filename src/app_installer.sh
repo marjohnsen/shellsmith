@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-APPS_DIR="./apps"
+APPS_DIR="$1" && shift
 
 install_handler() {
   local apps=("$@")

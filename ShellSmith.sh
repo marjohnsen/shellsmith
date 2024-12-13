@@ -1,19 +1,26 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-pushd "$(dirname "${BASH_SOURCE[0]}")" || exit 1
-trap 'popd' EXIT ERR INT TERM HUP
-
-source ./src/app_handler.sh
-source ./src/dependency_handler.sh
-source ./src/install_handler.sh
-
+APPS_DIR="${SHELLSMITH_APPS_DIR:-$HOME/.config/.shellsmith/apps}"
+SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
 APPS=()
-app_handler APPS
+
+if [[ ! -d "$APPS_DIR" ]]; then
+  echo "Error: Apps directory '$APPS_DIR' is missing."
+  echo "Create it with: mkdir -p '$HOME/.config/.shellsmith/apps'"
+  echo "Or set SHELLSMITH_APPS_DIR in your shell configuration."
+  exit 1
+fi
+
+source "$SCRIPT_DIR/src/app_handler.sh"
+source "$SCRIPT_DIR/src/dependency_handler.sh"
+source "$SCRIPT_DIR/src/app_installer.sh"
+
+app_handler APPS_DIR APPS
 
 if [[ "${#APPS[@]}" -eq 0 ]]; then
   echo "No applications were selected. Exiting..."
   exit 1
 fi
 
-dependency_handler APPS
-install_handler "${APPS[@]}"
+dependency_handler APPS_DIR APPS
+app_installer APPS_DIR "${APPS[@]}"

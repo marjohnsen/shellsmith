@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
+APPS_DIR="$1" && shift
 
 # Load dependencies from the app script
 load_dependencies() {
@@ -26,7 +28,7 @@ resolve_app() {
   processing_apps+=("$app")
 
   local dep_array
-  IFS=' ' read -r -a dep_array <<<"$(load_dependencies "./apps/$app.sh")"
+  IFS=' ' read -r -a dep_array <<<"$(load_dependencies "./$APPS_DIR/$app.sh")"
   for dep in "${dep_array[@]}"; do
     read -r -a resolved_apps <<<"$(resolve_app "$dep" resolved_apps[@] processing_apps[@])"
   done
@@ -81,7 +83,7 @@ prompt_for_missing_dependencies() {
   done
 }
 
-# The menu pormpted if dependencies are present
+# The menu prompted if dependencies are present
 dependency_handler() {
   local -n selected_apps_ref=$1
 
@@ -99,6 +101,5 @@ dependency_handler() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  SELECTED_APPS=("$@")
-  dependency_handler SELECTED_APPS
+  dependency_handler "$@"
 fi
