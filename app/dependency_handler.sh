@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-SHELLSMITH_DIR="$1" && shift
-
 # Load dependencies from the app script
 load_dependencies() {
   local first_double_slash
@@ -28,7 +26,7 @@ resolve_app() {
   processing_apps+=("$app")
 
   local dep_array
-  IFS=' ' read -r -a dep_array <<<"$(load_dependencies "./$SHELLSMITH_DIR/apps/$app.sh")"
+  IFS=' ' read -r -a dep_array <<<"$(load_dependencies "$SHELLSMITH_DIR/apps/$app.sh")"
   for dep in "${dep_array[@]}"; do
     read -r -a resolved_apps <<<"$(resolve_app "$dep" resolved_apps[@] processing_apps[@])"
   done
@@ -101,5 +99,6 @@ dependency_handler() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
+  SHELLSMITH_DIR="$1" && shift
   dependency_handler "$@"
 fi
