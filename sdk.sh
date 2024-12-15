@@ -6,7 +6,7 @@ show_help() {
   echo "Usage: $(basename "$0") <command> [args...]"
   echo ""
   echo "Commands:"
-  echo "  run                   Run ShellSmith application."
+  echo "  run                   Run ShellSmith."
   echo "  workspace             Manage and create the ShellSmith workspace."
   echo "  uninstall             Uninstall ShellSmith from your system."
   echo "  help                  Display this help message."

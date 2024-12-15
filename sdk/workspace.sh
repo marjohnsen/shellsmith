@@ -15,15 +15,22 @@ show_help() {
   echo ""
 }
 
-create_empty_workspace() {
+create_new_workspace() {
   if [[ -d "$SHELLSMITH_DIR" && -n "$(ls -A "$SHELLSMITH_DIR")" ]]; then
     echo "Workspace at $SHELLSMITH_DIR already exists and is not empty."
     backup_workspace
   fi
 
   mkdir -p "$SHELLSMITH_DIR/apps"
+
+  echo "utils/" >"$SHELLSMITH_DIR/.gitignore"
+
+  echo "#!/usr/bin/env bash" >"$SHELLSMITH_DIR/init.sh"
+  echo "# This file will always be execute first." >>"$SHELLSMITH_DIR/init.sh"
+  echo "# Can be used to install basic stuff from package managers and such." >>"$SHELLSMITH_DIR/init.sh"
+
   ln -s "$SCRIPT_DIR/../utils" "$SHELLSMITH_DIR/utils"
-  echo "Clean workspace created at $SHELLSMITH_DIR."
+  echo "Finished setting up new workspace at $SHELLSMITH_DIR."
 }
 
 delete_workspace() {
@@ -66,6 +73,7 @@ clone_repository() {
 
   echo "Cloning repository into $SHELLSMITH_DIR..."
   if git clone "$repo" "$SHELLSMITH_DIR"; then
+    ln -s "$SCRIPT_DIR/../utils" "$SHELLSMITH_DIR/utils"
     echo "Repository cloned successfully."
   else
     echo "Failed to clone repository."

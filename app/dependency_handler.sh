@@ -4,7 +4,7 @@
 load_dependencies() {
   local first_double_slash
   first_double_slash=$(sed -n '/^\/\/ /{p;q;}' "$1")
-  [[ $(basename "$1" .sh) == "packages" ]] && echo "" || echo "packages ${first_double_slash:3}"
+  [[ $(basename "$1" .sh) == "init" ]] && echo "" || echo "init ${first_double_slash:3}"
 }
 
 # Recursively resolve dependencies for a given app

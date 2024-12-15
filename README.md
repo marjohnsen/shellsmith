@@ -1,51 +1,75 @@
 # ShellSmith
 
-**ShellSmith** is a streamlined tool designed to automate system configuration on Unix-like operating systems. It offers a flexible framework for running user-defined scripts, whether for installing applications, managing dotfiles, or executing custom tasks. With a terminal-based user interface (TUI) for selecting and managing installations, and a lightweight yet powerful dependency handler, ShellSmith ensures that all scripts are executed in the correct order, making it ideal for automating setups and maintaining consistent environments.
+**ShellSmith** is a streamlined tool designed to automate system configuration on Unix-like operating systems.
 
-## Key Features
+It offers a flexible framework for running user-defined scripts, whether for installing applications, managing configuration files, or executing custom tasks.
 
-- **Intuitive TUI**: Provides a simple interface for selecting and managing user defined scripts, making the setup process fast and user-friendly.
-
-- **Efficient Dependency Handler**: Ensures that the user-defined scripts are executed in the correct sequence, based on defined dependencies.
-
-- **Flexible Scripting:** Enables users to fully customize how scripts handle installations. For example, users can (and should) manage existing installations by deciding whether to skip, overwrite, or apply specific logic tailored to their environment.
-
-- **Centralized Dotfile Management**: Efficiently manage dotfiles by symlinking them from a centralized location. The `safe_symlink` function ensures secure linking, preventing overwriting of existing files, and providing a reliable solution for maintaining consistent system configurations.
-
-## Repo Structure
-
-- **`apps/`**: Directory to place user-defined installation scripts.
-
-  - **`packages.sh`**: Positioned to be executed first (all apps depend on it by default). It can be used to install utilities like `curl` early on.
-
-- **`dotfiles/`**: Central repository for user configuration files. Use `safe_symlink` to safely link dotfiles to their appropriate location.
-  
-- **`misc/`**: Houses additional scripts or files, such as themes, that do not fall under applications or dotfiles.
-
-- **`utils/`**: Contains utility functions for ShellSmith.
-
-- **`src/`**: Core ShellSmith logic and functionality.
+With built-in dependency management, ShellSmith ensures that the user-defined scripts are executed in the correct order based on specified prerequisites, simplifying even the most complex workflows.
 
 ## Getting Started
 
-1. **Fork the repository**:
+### 1. Clone the repository
 
-    ```bash
-    git fork https://github.com/marjohnsen/ShellSmith.git
-    cd ShellSmith
-    ```
+To get started, clone the repository and run the installation script:
 
-2. **Create a custom script in `apps/` and add relevant files to `dotfiles/` and `misc/`:**
+```bash
+git clone https://github.com/marjohnsen/ShellSmith.git
+cd ShellSmith
+./setup.sh install
+```
+
+### 2. Setup your ShellSmith workspace
+
+The default workspace path is `~/.config/shellsmith`. TO use a custom path, set the `SHELLSMITH_WORKSPACE` environment variable by adding the following line to your `.bashrc` (or equivalent):
+
+```bash
+export  SHELLSMITH_WORKSPACE=<desired path>
+```
+
+Ensure `SHELLSMITH_WORKSPACE` is set before proceeding if you do not want the default location. ShellSmith will back up any existing workspace before creating or cloning a new one. Note that the author is not responsible for data loss under any circumstances.
+
+#### Create new workspace
+
+First time users can create a new workspace using:
+
+```bash
+smith workspace create
+```
+
+This will create a workspace with the following structure:
+
+- `apps/`: folder for your custom setup scripts.
+- `utils/`: Folder for utility functions to assist script development in `apps/`.
+- `init.sh`: a script that will always be executed first regardless of dependencies.
+- `.gitignore`: Ensures utils/ is ignored if the workspace is version-controlled.
+
+**You are encouraged to upload your workspace to github after creating it.**
+
+#### Clone existing workspace from github
+
+To use an existing ShellSmith workspace, clone it to your designated workspace location with:
+
+```bash
+smith workspace clone <url to your repo>
+```
+
+## Develop Setup Script
+
+Below is an example of a script to install `neovim` with `pyenv.sh` and `node.sh` as dependencies.
+
+### **Script Example:** `apps/neovim.sh`
+
+Note that ShellSmith only look for scripts under `apps/*.sh` in your workspace. You can however source code from anywhere within your `apps/*.sh` script.
+
+Dependencies are declared below the shebang using `//` followed by script names (excluding the .sh extension). The line `source utils/app_interface.sh` loads ShellSmith’s app interface for default behavior and utility functions like `safe_symlink`.
+
+A good practice is to ensure scripts are idempotent, meaning they can be run repeatedly without causing issues. In this example, `neovim` is uninstalled before being reinstalled.
 
    ```bash
     #!/bin/bash
-    # Dependencies are read from the first line starting with double slash.
-    # In this case, the dependency handler will make sure apps/pyenv.sh and
-    # apps/node.sh are installed before executing this script.
     // pyenv node
     
-    # app interface contain default behaviour and safe_symlink
-    source utils/app_interface.sh
+    source ../utils/app_interface.sh
 
     install_dependencies() {
       sudo apt install ripgrep fd-find texlive biber latexmk fuse -y
@@ -53,7 +77,6 @@
     }
 
     install_neovim() {
-      # Remove neovim if already installed (you can add any behaviour you like, this works for me)
       if [ -d "/opt/nvim" ]; then
         sudo rm -rf /opt/nvim ~/.local/share/nvim ~/.cache/nvim
       fi
@@ -66,12 +89,10 @@
     }
 
     setup_lazyvim() {
-      # Use safe_symlink to link dotfiles to appropriate location 
       safe_symlink "$PWD/dotfiles/nvim" "$HOME/.config/nvim"
     }
 
     setup_nvim_pyenv() {
-      # delete if it already exist
       if pyenv versions --bare | grep "^neovim$"; then
         pyenv virtualenv-delete -f neovim
       fi
@@ -89,8 +110,10 @@
     setup_nvim_pyenv
     ```
 
-3. **Execute ShellSmith:**
+## Running ShellSmith
 
-    ```bash
-    ./ShellSMith.sh
-    ```
+Once the script is added, you can view and execute it using:
+
+```bash
+smith run
+```
