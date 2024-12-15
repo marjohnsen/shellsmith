@@ -1,10 +1,10 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # Load dependencies from the app script
 load_dependencies() {
   local first_double_slash
   first_double_slash=$(sed -n '/^\/\/ /{p;q;}' "$1")
-  [[ $(basename "$1" .sh) == "packages" ]] && echo "" || echo "packages ${first_double_slash:3}"
+  [[ $(basename "$1" .sh) == "init" ]] && echo "" || echo "init ${first_double_slash:3}"
 }
 
 # Recursively resolve dependencies for a given app
@@ -26,7 +26,7 @@ resolve_app() {
   processing_apps+=("$app")
 
   local dep_array
-  IFS=' ' read -r -a dep_array <<<"$(load_dependencies "./apps/$app.sh")"
+  IFS=' ' read -r -a dep_array <<<"$(load_dependencies "$SHELLSMITH_DIR/apps/$app.sh")"
   for dep in "${dep_array[@]}"; do
     read -r -a resolved_apps <<<"$(resolve_app "$dep" resolved_apps[@] processing_apps[@])"
   done
@@ -81,7 +81,7 @@ prompt_for_missing_dependencies() {
   done
 }
 
-# The menu pormpted if dependencies are present
+# The menu prompted if dependencies are present
 dependency_handler() {
   local -n selected_apps_ref=$1
 
@@ -99,6 +99,6 @@ dependency_handler() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  SELECTED_APPS=("$@")
-  dependency_handler SELECTED_APPS
+  SHELLSMITH_DIR="$1" && shift
+  dependency_handler "$@"
 fi

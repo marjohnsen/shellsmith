@@ -1,12 +1,13 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 # List available apps by reading .sh files in the ./apps directory
 list_apps() {
   local apps=()
-  for app in ./apps/*.sh; do
+  for app in "$SHELLSMITH_DIR"/apps/*.sh; do
     apps+=("$(basename "$app" .sh)")
   done
   printf "%s\n" "${apps[@]}"
+  exit
 }
 
 # Add the selected app to the list
@@ -93,6 +94,6 @@ app_handler() {
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  selected_apps=()
-  app_handler selected_apps
+  SHELLSMITH_DIR="$1" && shift
+  app_handler selected_apps "$@"
 fi
