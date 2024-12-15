@@ -65,50 +65,50 @@ Dependencies are declared below the shebang using `//` followed by script names 
 
 A good practice is to ensure scripts are idempotent, meaning they can be run repeatedly without causing issues. In this example, `neovim` is uninstalled before being reinstalled.
 
-   ```bash
-    #!/bin/bash
-    // pyenv node
-    
-    source ../utils/app_interface.sh
+```bash
+#!/bin/bash
+// pyenv node
 
-    install_dependencies() {
-      sudo apt install ripgrep fd-find texlive biber latexmk fuse -y
-      sudo npm install -g neovim
-    }
+source ../utils/app_interface.sh
 
-    install_neovim() {
-      if [ -d "/opt/nvim" ]; then
-        sudo rm -rf /opt/nvim ~/.local/share/nvim ~/.cache/nvim
-      fi
+install_dependencies() {
+  sudo apt install ripgrep fd-find texlive biber latexmk fuse -y
+  sudo npm install -g neovim
+}
 
-      curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
-      chmod u+x nvim.appimage
+install_neovim() {
+  if [ -d "/opt/nvim" ]; then
+    sudo rm -rf /opt/nvim ~/.local/share/nvim ~/.cache/nvim
+  fi
 
-      sudo mkdir -p /opt/nvim
-      sudo mv nvim.appimage /opt/nvim/nvim
-    }
+  curl -LO https://github.com/neovim/neovim/releases/latest/download/nvim.appimage
+  chmod u+x nvim.appimage
 
-    setup_lazyvim() {
-      safe_symlink "$PWD/dotfiles/nvim" "$HOME/.config/nvim"
-    }
+  sudo mkdir -p /opt/nvim
+  sudo mv nvim.appimage /opt/nvim/nvim
+}
 
-    setup_nvim_pyenv() {
-      if pyenv versions --bare | grep "^neovim$"; then
-        pyenv virtualenv-delete -f neovim
-      fi
+setup_lazyvim() {
+  safe_symlink "$PWD/dotfiles/nvim" "$HOME/.config/nvim"
+}
 
-      pyenv virtualenv 3.10 neovim
+setup_nvim_pyenv() {
+  if pyenv versions --bare | grep "^neovim$"; then
+    pyenv virtualenv-delete -f neovim
+  fi
 
-      "$(pyenv prefix neovim)/bin/python" -m pip install --upgrade pip
-      "$(pyenv prefix neovim)/bin/python" -m pip install pynvim
+  pyenv virtualenv 3.10 neovim
 
-    }
+  "$(pyenv prefix neovim)/bin/python" -m pip install --upgrade pip
+  "$(pyenv prefix neovim)/bin/python" -m pip install pynvim
 
-    install_dependencies
-    install_neovim
-    setup_lazyvim
-    setup_nvim_pyenv
-    ```
+}
+
+install_dependencies
+install_neovim
+setup_lazyvim
+setup_nvim_pyenv
+```
 
 ## Running ShellSmith
 
