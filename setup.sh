@@ -5,7 +5,7 @@ SHELLSMITH_DIR="${SHELLSMITH_WORKSPACE:-$HOME/.config/shellsmith}"
 
 install_shellsmith() {
   mkdir -p "$SHELLSMITH_DIR"
-  sudo ln -s "$SCRIPT_DIR/sdk.sh" "/usr/local/bin/smith"
+  sudo ln -s "$SCRIPT_DIR/cli.sh" "/usr/local/bin/smith"
   echo "Setup complete."
 }
 

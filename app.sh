@@ -12,6 +12,8 @@ if [[ ! -d "$SHELLSMITH_DIR/apps" ]]; then
   exit 1
 fi
 
+cd "$SHELLSMITH_DIR/apps"
+
 export SHELLSMITH_DIR
 source "$SCRIPT_DIR/app/app_handler.sh"
 source "$SCRIPT_DIR/app/dependency_handler.sh"

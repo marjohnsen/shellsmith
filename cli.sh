@@ -26,7 +26,7 @@ run)
   "$SCRIPT_DIR/app.sh"
   ;;
 workspace)
-  "$SCRIPT_DIR/sdk/workspace.sh" "$@"
+  "$SCRIPT_DIR/cli/workspace.sh" "$@"
   ;;
 uninstall)
   "$SCRIPT_DIR/setup.sh" uninstall
