@@ -12,7 +12,7 @@ if [[ ! -d "$SHELLSMITH_DIR/apps" ]]; then
   exit 1
 fi
 
-cd "$SHELLSMITH_DIR/apps"
+cd "$SHELLSMITH_DIR/apps" || return
 
 export SHELLSMITH_DIR
 source "$SCRIPT_DIR/app/app_handler.sh"

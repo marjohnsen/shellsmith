@@ -7,8 +7,6 @@ show_help() {
   echo ""
   echo "Commands:"
   echo "  run                   Run ShellSmith."
-  echo "  workspace             Manage and create the ShellSmith workspace."
-  echo "  uninstall             Uninstall ShellSmith from your system."
   echo "  help                  Display this help message."
   echo ""
 }
@@ -24,12 +22,6 @@ shift
 case "$command" in
 run)
   "$SCRIPT_DIR/app.sh"
-  ;;
-workspace)
-  "$SCRIPT_DIR/cli/workspace.sh" "$@"
-  ;;
-uninstall)
-  "$SCRIPT_DIR/setup.sh" uninstall
   ;;
 help)
   show_help
