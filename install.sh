@@ -18,6 +18,20 @@ verify_submodule() {
   }
 }
 
+update_submodules() {
+  echo "Updating submodules in $SHELLSMITH_WORKSPACE..."
+  git -C "$SHELLSMITH_WORKSPACE" submodule update --init --recursive
+  git -C "$SHELLSMITH_WORKSPACE" submodule update --remote
+  echo "Submodules updated successfully."
+}
+
+enable_merge_workflow() {
+  echo "Configuring pull.rebase=false for $SHELLSMITH_WORKSPACE..."
+  git -C "$SHELLSMITH_WORKSPACE" config pull.rebase false
+  echo "Enabling submodule.recurse=true for $SHELLSMITH_WORKSPACE..."
+  git -C "$SHELLSMITH_WORKSPACE" config submodule.recurse true
+}
+
 create_launch_script() {
   rm -f "$SHELLSMITH_LAUNCH"
   cat >"$SHELLSMITH_LAUNCH" <<EOF
@@ -34,6 +48,9 @@ EOF
 }
 
 verify_submodule
+update_submodules
+enable_merge_workflow
+
 create_launch_script || echo "Error: Failed to create launch script." >&2 && exit 1
 
 echo "ShellSmith installed successfully at $SHELLSMITH_ROOT. Run 'smith help' to get started."
