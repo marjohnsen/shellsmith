@@ -22,7 +22,6 @@ update_submodules() {
   echo "Updating submodules in $SHELLSMITH_WORKSPACE..."
   git -C "$SHELLSMITH_WORKSPACE" submodule update --init --recursive
   git -C "$SHELLSMITH_WORKSPACE" submodule update --remote
-  echo "Submodules updated successfully."
 }
 
 enable_merge_workflow() {
