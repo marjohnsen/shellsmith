@@ -7,7 +7,7 @@ show_help() {
   echo ""
   echo "Commands:"
   echo "  run                   Run ShellSmith"
-  echo "  workspace             Go-to workspace"
+  echo "  workspace             Go-to ShellSmith workspace"
   echo "  update                Update ShellSmith"
   echo "  help                  Display this help message"
   echo ""
@@ -15,6 +15,7 @@ show_help() {
 
 update_and_commit() {
   echo "Updating the .shellsmith submodule in $SHELLSMITH_WORKSPACE..."
+  echo ""
 
   if ! git -C "$SHELLSMITH_WORKSPACE" submodule update --remote --recursive .shellsmith; then
     echo "Failed to update the .shellsmith submodule. Please verify your configuration and try again."
@@ -22,6 +23,7 @@ update_and_commit() {
   fi
 
   if ! git -C "$SHELLSMITH_WORKSPACE" diff --quiet -- .shellsmith; then
+    echo ""
     echo "The .shellsmith submodule has been updated to the latest version."
     read -p "Would you like to commit the changes to your repository? (y/n): " choice
     if [[ "$choice" =~ ^[Yy]$ ]]; then
