@@ -25,7 +25,8 @@ run)
   "$SCRIPT_DIR/app.sh"
   ;;
 update)
-  git -C "$SHELLSMITH_WORKSPACE" submodule update --remote --recursive
+  echo "Updating the .shellsmith submodule..."
+  git -C "$SHELLSMITH_WORKSPACE" submodule update --remote --recursive && echo "Update complete." || echo "Already up-to-date."
   ;;
 workspace)
   cd "$SHELLSMITH_WORKSPACE" || {
