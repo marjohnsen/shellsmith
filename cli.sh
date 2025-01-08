@@ -7,6 +7,7 @@ show_help() {
   echo ""
   echo "Commands:"
   echo "  run                   Run ShellSmith."
+  echo "  update                Update ShellSmith."
   echo "  help                  Display this help message."
   echo ""
 }
@@ -23,13 +24,21 @@ case "$command" in
 run)
   "$SCRIPT_DIR/app.sh"
   ;;
+update)
+  git -C "$SHELLSMITH_WORKSPACE" submodule update --remote --recursive
+  ;;
+workspace)
+  cd "$SHELLSMITH_WORKSPACE" || {
+    echo "Error: Unable to change directory to $SHELLSMITH_WORKSPACE" >&2
+    exit 1
+  }
+  $SHELL
+  ;;
 help)
   show_help
   ;;
 *)
-  echo ""
-  echo "Unknown command: $command"
-  echo ""
+  echo -e "\nUnknown command: $command\n"
   show_help
   exit 1
   ;;
