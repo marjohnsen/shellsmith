@@ -34,4 +34,4 @@ EOF
 
 verify_submodule
 create_launch_script
-echo "ShellSmith installed successfully at $SHELLSMITH_ROOT. Run 'smith help' to get started."
+echo "ShellSmith installed successfully at $SHELLSMITH_LAUNCH. Run 'smith help' to get started."
