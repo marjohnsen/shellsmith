@@ -30,10 +30,8 @@ export SHELLSMITH_UTILS="$SHELLSMITH_UTILS"
 "$SHELLSMITH_ROOT/cli.sh" "\$@"
 EOF
   chmod +x "$SHELLSMITH_LAUNCH"
-  echo "Launch script created at $SHELLSMITH_LAUNCH"
 }
 
 verify_submodule
 create_launch_script || echo "Error: Failed to create launch script." >&2 && exit 1
-
 echo "ShellSmith installed successfully at $SHELLSMITH_ROOT. Run 'smith help' to get started."
