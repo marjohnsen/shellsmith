@@ -14,25 +14,27 @@ show_help() {
 }
 
 update_and_commit() {
-  echo "Updating the .shellsmith submodule..."
+  echo "Updating the .shellsmith submodule in $SHELLSMITH_WORKSPACE..."
 
   if ! git -C "$SHELLSMITH_WORKSPACE" submodule update --remote --recursive .shellsmith; then
-    echo "Error updating the submodule. Please check your setup."
+    echo "Failed to update the .shellsmith submodule. Please verify your configuration and try again."
     return 1
   fi
 
   if ! git -C "$SHELLSMITH_WORKSPACE" diff --quiet -- .shellsmith; then
-    echo "ShellSmith submodule was updated to the latest version."
-    read -p "Do you want to commit the changes? (y/n): " choice
+    echo "The .shellsmith submodule has been updated to the latest version."
+    read -p "Would you like to commit the changes to your repository? (y/n): " choice
     if [[ "$choice" =~ ^[Yy]$ ]]; then
+      echo ""
       git -C "$SHELLSMITH_WORKSPACE" add .shellsmith
-      git -C "$SHELLSMITH_WORKSPACE" commit -m "update shellsmith to latest commit"
-      echo "The update is commited to your workspace repository."
+      git -C "$SHELLSMITH_WORKSPACE" commit -m "Update .shellsmith to the latest commit"
+      echo ""
+      echo "Changes have been successfully committed to your workspace repository."
     else
-      echo "The update was not commited."
+      echo "Update completed, but changes were not committed."
     fi
   else
-    echo "The .shellsmith submodule is already up-to-date."
+    echo "The .shellsmith submodule is already up to date. No changes detected."
   fi
 }
 
