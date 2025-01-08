@@ -33,5 +33,5 @@ EOF
 }
 
 verify_submodule
-create_launch_script || echo "Error: Failed to create launch script." >&2 && exit 1
+create_launch_script
 echo "ShellSmith installed successfully at $SHELLSMITH_ROOT. Run 'smith help' to get started."
