@@ -100,6 +100,8 @@ dependency_handler() {
   fi
 
   echo -e "\033[1;34mFinal installation order: ${selected_apps_ref[*]}\033[0m"
+
+  read -rp "Press Enter to start the installation process..."
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
