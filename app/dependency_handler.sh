@@ -64,7 +64,7 @@ prompt_for_missing_dependencies() {
   local selected_apps=("${!2}")
   local missing_deps=("${!3}")
 
-  [[ ${#missing_deps[@]} -eq 0 ]] && return 0
+  [[ ${#missing_deps[@]} -eq 0 ]] && echo -e "\033[1;34mFinal installation order: ${resolved_apps[*]}\033[0m" && return 0
 
   echo -e "\nThe following dependencies are required but were not explicitly selected:"
   for dep in "${missing_deps[@]}"; do echo "- $dep"; done
@@ -95,13 +95,7 @@ dependency_handler() {
 
   if prompt_for_missing_dependencies resolved_apps[@] selected_apps[@] missing_deps[@]; then
     selected_apps_ref=("${resolved_apps[@]}")
-  else
-    read -r -a selected_apps_ref <<<"$(resolve_dependencies "${selected_apps[@]}")"
   fi
-
-  echo -e "\033[1;34mFinal installation order: ${selected_apps_ref[*]}\033[0m"
-
-  read -rp "Press Enter to start the installation process..."
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
