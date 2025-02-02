@@ -1,11 +1,10 @@
 #!/usr/bin/env bash
 
 app_installer() {
-  local apps=("$@")
+  local apps="$1"
 
-  for app in "${apps[@]}"; do
-    local app_script="$SHELLSMITH_DIR/apps/$app.sh"
-
+  echo "$apps" | while read -r app; do
+    local app_script="$SHELLSMITH_WORKSPACE/apps/$app.sh"
     echo -e "\n\033[1;34mInstalling $app...\033[0m"
 
     if [[ -f "$app_script" ]]; then
@@ -16,13 +15,16 @@ app_installer() {
         exit 1
       fi
     else
-      echo -e "\033[1;33m⚠ $app.sh not found in workspace: '$SHELLSMITH_DIR/apps'. Exiting...\033[0m"
+      echo -e "\033[1;33m⚠ $app.sh not found in workspace: '$SHELLSMITH_WORKSPACE/apps'. Exiting...\033[0m"
       exit 1
     fi
   done
 }
 
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  SHELLSMITH_DIR="$1" && shift
-  install_apps "$@"
+  if [[ -z "$SHELLSMITH_WORKSPACE" ]]; then
+    read -e -r -p "Enter your ShellSmith workspace: " SHELLSMITH_WORKSPACE
+    SHELLSMITH_WORKSPACE=$(realpath -m -- "${SHELLSMITH_WORKSPACE/#\~/$HOME}")
+  fi
+  app_installer "$*"
 fi
