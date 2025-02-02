@@ -28,17 +28,17 @@ display_apps() {
 
   available=$(echo "$available" | awk '{print NR, $0}')
 
-  echo "Available apps:"
+  echo "Available apps:" >/dev/tty
   echo "$available" | while read -r index app; do
     if ! echo "$selected" | grep -qx "$app"; then
-      echo -e "\033[1;31m$index. $app\033[0m"
+      echo -e "\033[1;31m$index. $app\033[0m" >/dev/tty
     fi
   done
 
-  echo -e "\nSelected apps:"
+  echo -e "\nSelected apps:" >/dev/tty
   echo "$available" | while read -r index app; do
     if echo "$selected" | grep -qx "$app"; then
-      echo -e "\033[1;32m$index. $app\033[0m"
+      echo -e "\033[1;32m$index. $app\033[0m" >/dev/tty
     fi
   done
 }
@@ -52,13 +52,14 @@ app_handler() {
   available=$(list_apps)
 
   while true; do
-    clear
+    clear >/dev/tty
     display_apps "$available" "$selected"
 
-    echo -e "\ns) \033[1;32mSelect all\033[0m"
-    echo -e "d) \033[1;31mDeselect all\033[0m"
-    echo -e "c) Continue"
-    read -r choice
+    echo -e "\ns) \033[1;32mSelect all\033[0m" >/dev/tty
+    echo -e "d) \033[1;31mDeselect all\033[0m" >/dev/tty
+    echo -e "c) Continue" >/dev/tty
+
+    read -r choice </dev/tty
 
     case "$choice" in
     [0-9]*)
@@ -86,5 +87,5 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     read -e -r -p "Enter your ShellSmith workspace: " SHELLSMITH_WORKSPACE
     SHELLSMITH_WORKSPACE=$(realpath -m -- "${SHELLSMITH_WORKSPACE/#\~/$HOME}")
   fi
-  app_handler "$@"
+  app_handler
 fi

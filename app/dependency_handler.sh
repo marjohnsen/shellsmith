@@ -5,7 +5,7 @@ load_dependencies() {
   local app="$SHELLSMITH_WORKSPACE/apps/$1.sh"
   local first_double_slash_line
   first_double_slash_line=$(sed -n '/^\/\/ /{s/^\/\/ //;p;q;}' "$app")
-  echo "$first_double_slash_line" | tr ' ' '\n'
+  echo -e "$first_double_slash_line" | tr ' ' '\n'
 }
 
 # Resolve dependencies recursively for the selected app
@@ -13,7 +13,7 @@ trace_dependencies_recursively() {
   local app="$1"
   local dependencies
 
-  if echo "$seen" | grep -qx "$app"; then
+  if echo -e "$seen" | grep -qx "$app"; then
     return
   fi
   seen="$seen$app"$'\n'
@@ -24,7 +24,7 @@ trace_dependencies_recursively() {
     [[ -n "$dep" ]] && trace_dependencies_recursively "$dep"
   done <<<"$dependencies"
 
-  if ! echo "$resolved" | grep -qx "$app"; then
+  if ! echo -e "$resolved" | grep -qx "$app"; then
     resolved="$resolved$app"$'\n'
   fi
 }
@@ -36,44 +36,44 @@ dependency_handler() {
   local seen=""
   local missing_dependencies=""
 
-  # Trace dependencies
+  # Trace dependencies for each selected app
   while IFS= read -r app; do
     [[ -n "$app" ]] && trace_dependencies_recursively "$app"
   done <<<"$selected_apps"
 
   # Identify missing dependencies
-  missing_dependencies=$(echo "$resolved" | grep -Fxv -f <(echo "$selected_apps") || true)
+  missing_dependencies=$(echo -e "$resolved" | grep -Fxv -f <(echo -e "$selected_apps") || true)
 
   # Step 1: Ask if dependencies should be resolved
-  printf "\nWould you like to resolve dependencies for the selected apps? (yes/no): "
-  read -r choice
+  echo -e "\nWould you like to resolve dependencies for the selected apps? (yes/no): " >/dev/tty
+  read -r choice </dev/tty
   if [[ "$choice" != "yes" && "$choice" != "y" ]]; then
-    printf "\n\033[1;31mUsing only selected apps, without resolving dependencies.\033[0m\n"
-    printf "%s\n" "$selected_apps"
+    echo -e "\n\033[1;31mUsing only selected apps, without resolving dependencies.\033[0m\n" >/dev/tty
+    echo -e "$selected_apps"
     return
   fi
 
   # Step 2: If dependencies are missing, ask if they should be added
   if [[ -n "$missing_dependencies" ]]; then
-    printf "\n\033[1;33mThe following dependencies are missing:\033[0m\n"
-    printf "%s\n" "$missing_dependencies"
-    printf "\nWould you like to include them? (yes/no): "
-    read -r choice
+    echo -e "\n\033[1;33mThe following dependencies are missing:\033[0m" >/dev/tty
+    echo -e "$missing_dependencies" >/dev/tty
+    echo -e "\nWould you like to include them? (yes/no): " >/dev/tty
+    read -r choice </dev/tty
     if [[ "$choice" != "yes" && "$choice" != "y" ]]; then
-      printf "\n\033[1;32mIgnoring missing dependencies but resolving the rest...\033[0m\n"
-      resolved=$(echo "$resolved" | grep -Fxv -f <(echo "$missing_dependencies"))
+      echo -e "\n\033[1;32mIgnoring missing dependencies but resolving the rest...\033[0m\n" >/dev/tty
+      resolved=$(echo -e "$resolved" | grep -Fxv -f <(echo -e "$missing_dependencies"))
     else
-      printf "\n\033[1;32mIncluding missing dependencies...\033[0m\n"
+      echo -e "\n\033[1;32mIncluding missing dependencies...\033[0m\n" >/dev/tty
     fi
   fi
 
-  printf "%s\n" "$resolved"
+  echo -e "$resolved"
 }
 
 # Example usage
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   if [[ -z "$SHELLSMITH_WORKSPACE" ]]; then
-    read -e -r -p "Enter your ShellSmith workspace: " SHELLSMITH_WORKSPACE
+    read -e -r -p "Enter your ShellSmith workspace: " SHELLSMITH_WORKSPACE </dev/tty
     SHELLSMITH_WORKSPACE=$(realpath -m -- "${SHELLSMITH_WORKSPACE/#\~/$HOME}")
   fi
   dependency_handler "$(printf "%b" "$1")" "$2"

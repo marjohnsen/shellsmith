@@ -16,8 +16,6 @@ if [[ ! -d "$SHELLSMITH_WORKSPACE/apps" ]]; then
   exit 1
 fi
 
-cd "$SHELLSMITH_WORKSPACE/apps" || exit 1
-
 selected_apps=$(app_handler)
 
 if [[ -z "$selected_apps" ]]; then
