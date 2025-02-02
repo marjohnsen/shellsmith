@@ -43,7 +43,7 @@ display_apps() {
   done
 }
 
-# Loop to select and deselect apps
+# Terminal menu to select apps to install
 app_handler() {
   local app
   local available
@@ -80,6 +80,7 @@ app_handler() {
   echo -e "$selected"
 }
 
+# Example usage
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   if [[ -z "$SHELLSMITH_WORKSPACE" ]]; then
     read -e -r -p "Enter your ShellSmith workspace: " SHELLSMITH_WORKSPACE

@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+# Installs the apps passed as an argument
 app_installer() {
   local apps="$1"
 
@@ -21,6 +22,7 @@ app_installer() {
   done
 }
 
+# Example usage
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   if [[ -z "$SHELLSMITH_WORKSPACE" ]]; then
     read -e -r -p "Enter your ShellSmith workspace: " SHELLSMITH_WORKSPACE
