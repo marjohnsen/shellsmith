@@ -6,31 +6,25 @@ set -E
 
 trap 'echo "[ERROR] Command \"${BASH_COMMAND}\" failed at line ${LINENO} in script ${BASH_SOURCE[0]}. Exiting..." >&2; exit 1' ERR
 
-SHELLSMITH_DIR="${SHELLSMITH_WORKSPACE:-$HOME/.config/shellsmith}"
-SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
-APPS=()
+source "$SHELLSMITH_ROOT/app/app_handler.sh" || exit 1
+source "$SHELLSMITH_ROOT/app/dependency_handler.sh" || exit 1
+source "$SHELLSMITH_ROOT/app/app_installer.sh" || exit 1
 
-if [[ ! -d "$SHELLSMITH_DIR/apps" ]]; then
-  echo "Error: Apps directory '$SHELLSMITH_DIR/apps' is missing."
+if [[ ! -d "$SHELLSMITH_WORKSPACE/apps" ]]; then
+  echo "Error: Apps directory '$SHELLSMITH_WORKSPACE/apps' is missing."
   echo "Please create a valid workspace."
-  echo "See 'smith workspace help' for more information."
-
   exit 1
 fi
 
-cd "$SHELLSMITH_DIR/apps" || return
+cd "$SHELLSMITH_WORKSPACE/apps" || exit 1
 
-export SHELLSMITH_DIR
-source "$SCRIPT_DIR/app/app_handler.sh"
-source "$SCRIPT_DIR/app/dependency_handler.sh"
-source "$SCRIPT_DIR/app/app_installer.sh"
+selected_apps=$(app_handler)
 
-app_handler APPS
-
-if [[ "${#APPS[@]}" -eq 0 ]]; then
+if [[ -z "$selected_apps" ]]; then
   echo "No applications were selected. Exiting..."
   exit 1
 fi
 
-dependency_handler APPS
-app_installer "${APPS[@]}"
+selected_apps_ordered=$(dependency_handler "$selected_apps")
+
+app_installer "$selected_apps_ordered"

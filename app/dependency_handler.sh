@@ -2,103 +2,79 @@
 
 # Load dependencies from the app script
 load_dependencies() {
-  local first_double_slash
-  first_double_slash=$(sed -n '/^\/\/ /{p;q;}' "$1")
-  [[ $(basename "$1" .sh) == "init" ]] && echo "" || echo "init ${first_double_slash:3}"
+  local app="$SHELLSMITH_WORKSPACE/apps/$1.sh"
+  local first_double_slash_line
+  first_double_slash_line=$(sed -n '/^\/\/ /{s/^\/\/ //;p;q;}' "$app")
+  echo "$first_double_slash_line" | tr ' ' '\n'
 }
 
-# Recursively resolve dependencies for a given app
-resolve_app() {
+# Resolve dependencies recursively for the selected app
+trace_dependencies_recursively() {
   local app="$1"
-  local resolved_apps=("${!2}")
-  local processing_apps=("${!3}")
+  local dependencies
 
-  if [[ " ${processing_apps[*]} " =~ $app ]]; then
-    echo "Error: Circular dependency for $app" >&2
-    exit 1
+  if echo "$seen" | grep -qx "$app"; then
+    return
   fi
+  seen="$seen$app"$'\n'
 
-  if [[ " ${resolved_apps[*]} " =~ $app ]]; then
-    echo "${resolved_apps[@]}"
+  dependencies=$(load_dependencies "$app")
+
+  while IFS= read -r dep; do
+    [[ -n "$dep" ]] && trace_dependencies_recursively "$dep"
+  done <<<"$dependencies"
+
+  if ! echo "$resolved" | grep -qx "$app"; then
+    resolved="$resolved$app"$'\n'
+  fi
+}
+
+# Handle dependencies per app selected by the user
+dependency_handler() {
+  local selected_apps="$1"
+  local resolved=""
+  local seen=""
+  local missing_dependencies=""
+
+  # Trace dependencies
+  while IFS= read -r app; do
+    [[ -n "$app" ]] && trace_dependencies_recursively "$app"
+  done <<<"$selected_apps"
+
+  # Identify missing dependencies
+  missing_dependencies=$(echo "$resolved" | grep -Fxv -f <(echo "$selected_apps") || true)
+
+  # Step 1: Ask if dependencies should be resolved
+  printf "\nWould you like to resolve dependencies for the selected apps? (yes/no): "
+  read -r choice
+  if [[ "$choice" != "yes" && "$choice" != "y" ]]; then
+    printf "\n\033[1;31mUsing only selected apps, without resolving dependencies.\033[0m\n"
+    printf "%s\n" "$selected_apps"
     return
   fi
 
-  processing_apps+=("$app")
-
-  local dep_array
-  IFS=' ' read -r -a dep_array <<<"$(load_dependencies "$SHELLSMITH_DIR/apps/$app.sh")"
-  for dep in "${dep_array[@]}"; do
-    read -r -a resolved_apps <<<"$(resolve_app "$dep" resolved_apps[@] processing_apps[@])"
-  done
-  resolved_apps+=("$app")
-
-  echo "${resolved_apps[@]}"
-}
-
-# Resolve dependencies for selected apps
-resolve_dependencies() {
-  local selected_apps=("${@}")
-  local resolved_apps=() processing_apps=()
-
-  for app in "${selected_apps[@]}"; do
-    read -r -a resolved_apps <<<"$(resolve_app "$app" resolved_apps[@] processing_apps[@])"
-  done
-  echo "${resolved_apps[@]}"
-}
-
-# Find missing dependencies that aren't in selected apps
-find_missing_dependencies() {
-  local selected_apps=("${!1}")
-  local resolved_apps=("${!2}")
-  local missing_deps=()
-
-  for app in "${resolved_apps[@]}"; do
-    [[ ! " ${selected_apps[*]} " =~ " $app " ]] && missing_deps+=("$app")
-  done
-  echo "${missing_deps[@]}"
-}
-
-# Prompt user to handle missing dependencies
-prompt_for_missing_dependencies() {
-  local resolved_apps=("${!1}")
-  local selected_apps=("${!2}")
-  local missing_deps=("${!3}")
-
-  [[ ${#missing_deps[@]} -eq 0 ]] && echo -e "\033[1;34mFinal installation order: ${resolved_apps[*]}\033[0m" && return 0
-
-  echo -e "\nThe following dependencies are required but were not explicitly selected:"
-  for dep in "${missing_deps[@]}"; do echo "- $dep"; done
-
-  while true; do
-    echo -e "\nY) Add missing dependencies and install\nN) Install selected apps only\nA) Abort"
-    read -r -p "Choice: " choice
-    case "$choice" in
-    y | Y) return 0 ;;
-    n | N) return 1 ;;
-    a | A) echo "Aborting." && exit 1 ;;
-    *) echo "Invalid choice. Please enter Y, N, or A." ;;
-    esac
-  done
-}
-
-# The menu prompted if dependencies are present
-dependency_handler() {
-  local -n selected_apps_ref=$1
-
-  local selected_apps=("${selected_apps_ref[@]}")
-  local resolved_apps=()
-  local missing_deps=()
-
-  read -r -a resolved_apps <<<"$(resolve_dependencies "${selected_apps[@]}")"
-
-  read -r -a missing_deps <<<"$(find_missing_dependencies selected_apps[@] resolved_apps[@])"
-
-  if prompt_for_missing_dependencies resolved_apps[@] selected_apps[@] missing_deps[@]; then
-    selected_apps_ref=("${resolved_apps[@]}")
+  # Step 2: If dependencies are missing, ask if they should be added
+  if [[ -n "$missing_dependencies" ]]; then
+    printf "\n\033[1;33mThe following dependencies are missing:\033[0m\n"
+    printf "%s\n" "$missing_dependencies"
+    printf "\nWould you like to include them? (yes/no): "
+    read -r choice
+    if [[ "$choice" != "yes" && "$choice" != "y" ]]; then
+      printf "\n\033[1;32mIgnoring missing dependencies but resolving the rest...\033[0m\n"
+      resolved=$(echo "$resolved" | grep -Fxv -f <(echo "$missing_dependencies"))
+    else
+      printf "\n\033[1;32mIncluding missing dependencies...\033[0m\n"
+    fi
   fi
+
+  printf "%s\n" "$resolved"
 }
 
+# Example usage
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
-  SHELLSMITH_DIR="$1" && shift
-  dependency_handler "$@"
+  if [[ -z "$SHELLSMITH_WORKSPACE" ]]; then
+    read -e -r -p "Enter your ShellSmith workspace: " SHELLSMITH_WORKSPACE
+    SHELLSMITH_WORKSPACE=$(realpath -m -- "${SHELLSMITH_WORKSPACE/#\~/$HOME}")
+  fi
+  dependency_handler "$(printf "%b" "$1")" "$2"
 fi
