@@ -22,7 +22,7 @@ app_installer() {
   done
 }
 
-# Example usage
+# When executed directly
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   if [[ -z "$SHELLSMITH_WORKSPACE" ]]; then
     read -e -r -p "Enter your ShellSmith workspace: " SHELLSMITH_WORKSPACE

@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+SELECTED_APPS=""
+
 # List available apps by reading .sh files in the ./apps directory
 list_apps() {
   for app in "$SHELLSMITH_WORKSPACE"/apps/*.sh; do
@@ -11,14 +13,14 @@ list_apps() {
 select_app() {
   local apps="$1"
   local app="$2"
-  echo -e "$apps\n$app" | awk '!seen[$0]++'
+  printf "%s\n%s\n" "$apps" "$app" | awk '!seen[$0]++'
 }
 
 # Remove the selected app from the list
 deselect_app() {
   local apps="$1"
   local app="$2"
-  echo "$apps" | grep -vx "$app"
+  printf "%s\n" "$apps" | grep -vx "$app"
 }
 
 # Display available and selected apps
@@ -26,19 +28,19 @@ display_apps() {
   local available="$1"
   local selected="$2"
 
-  available=$(echo "$available" | awk '{print NR, $0}')
+  available=$(printf "%s\n" "$available" | awk '{print NR, $0}')
 
-  echo "Available apps:" >/dev/tty
-  echo "$available" | while read -r index app; do
-    if ! echo "$selected" | grep -qx "$app"; then
-      echo -e "\033[1;31m$index. $app\033[0m" >/dev/tty
+  printf "Available apps:\n"
+  printf "%s\n" "$available" | while read -r index app; do
+    if ! printf "%s\n" "$selected" | grep -qx "$app"; then
+      printf "\033[1;31m%s. %s\033[0m\n" "$index" "$app"
     fi
   done
 
-  echo -e "\nSelected apps:" >/dev/tty
-  echo "$available" | while read -r index app; do
-    if echo "$selected" | grep -qx "$app"; then
-      echo -e "\033[1;32m$index. $app\033[0m" >/dev/tty
+  printf "\nSelected apps:\n"
+  printf "%s\n" "$available" | while read -r index app; do
+    if printf "%s\n" "$selected" | grep -qx "$app"; then
+      printf "\033[1;32m%s. %s\033[0m\n" "$index" "$app"
     fi
   done
 }
@@ -52,20 +54,20 @@ app_handler() {
   available=$(list_apps)
 
   while true; do
-    clear >/dev/tty
+    clear
     display_apps "$available" "$selected"
 
-    echo -e "\ns) \033[1;32mSelect all\033[0m" >/dev/tty
-    echo -e "d) \033[1;31mDeselect all\033[0m" >/dev/tty
-    echo -e "c) Continue" >/dev/tty
+    printf "\ns) \033[1;32mSelect all\033[0m\n"
+    printf "d) \033[1;31mDeselect all\033[0m\n"
+    printf "c) Continue\n"
 
     read -r choice </dev/tty
 
     case "$choice" in
     [0-9]*)
-      app=$(echo "$available" | sed -n "${choice}p")
-      if [ -n "$app" ]; then
-        if echo "$selected" | grep -qx "$app"; then
+      app=$(printf "%s\n" "$available" | sed -n "${choice}p")
+      if [[ -n "$app" ]]; then
+        if printf "%s\n" "$selected" | grep -qx "$app"; then
           selected=$(deselect_app "$selected" "$app")
         else
           selected=$(select_app "$selected" "$app")
@@ -78,10 +80,10 @@ app_handler() {
     esac
   done
 
-  echo -e "$selected"
+  SELECTED_APPS="$selected"
 }
 
-# Example usage
+# When executed directly
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   if [[ -z "$SHELLSMITH_WORKSPACE" ]]; then
     read -e -r -p "Enter your ShellSmith workspace: " SHELLSMITH_WORKSPACE
