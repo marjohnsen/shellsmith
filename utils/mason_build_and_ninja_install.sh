@@ -57,5 +57,3 @@ build_and_install() {
   meson setup "$main_dir/build" "$main_dir" --prefix=/usr/local || error_exit "Meson setup failed for $main_dir"
   ninja -C "$main_dir/build" -j2 || error_exit "Build failed for $main_dir"
 }
-
-meson_build_and_ninja_install "$@"

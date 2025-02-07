@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
-
 show_help() {
   echo "Usage: $(basename "$0") <command> [args...]"
   echo ""
@@ -58,7 +56,7 @@ shift
 
 case "$command" in
 run)
-  "$SCRIPT_DIR/app.sh"
+  "$SHELLSMITH_WORKSPACE_APPS/app.sh"
   ;;
 update)
   update_and_commit
