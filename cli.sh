@@ -56,7 +56,7 @@ shift
 
 case "$command" in
 run)
-  "$SHELLSMITH_WORKSPACE_APPS/app.sh"
+  "$SHELLSMITH_ROOT/app.sh"
   ;;
 update)
   update_and_commit
