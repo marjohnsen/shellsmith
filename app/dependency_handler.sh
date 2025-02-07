@@ -55,7 +55,6 @@ dependency_handler() {
   if [[ ! "$choice" =~ ^[Yy]([Ee][Ss])?$ ]]; then
     printf "\n\033[1;31mUsing only selected apps, without resolving dependencies.\033[0m\n"
     RESOLVED_APPS="${selected_apps}"
-    return
   fi
 
   # If dependencies are missing, ask if they should be added
