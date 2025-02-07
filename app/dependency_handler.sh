@@ -54,7 +54,6 @@ dependency_handler() {
   read -r choice
   if [[ ! "$choice" =~ ^[Yy]([Ee][Ss])?$ ]]; then
     printf "\n\033[1;31mUsing only selected apps, without resolving dependencies.\033[0m\n"
-    printf "%s\n" "$"
     RESOLVED_APPS="${selected_apps}"
     return
   fi
