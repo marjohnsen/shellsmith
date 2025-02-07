@@ -13,33 +13,32 @@ load_dependencies() {
   fi
 }
 
-# Resolve dependencies recursively for the selected app
-trace_dependencies_recursively() {
-  local app="$1"
-  local dependencies
-
-  if printf "%s\n" "$seen" | grep -qx "$app"; then
-    return
-  fi
-  seen="$seen$app"$'\n'
-
-  dependencies=$(load_dependencies "$app")
-
-  while IFS= read -r dep; do
-    [[ -n "$dep" ]] && trace_dependencies_recursively "$dep"
-  done <<<"$dependencies"
-
-  if ! printf "%s\n" "$resolved" | grep -qx "$app"; then
-    resolved="$resolved$app"$'\n'
-  fi
-}
-
 # Handle dependencies per app selected by the user
 dependency_handler() {
   local selected_apps="$1"
-  local resolved=""
-  local seen=""
   local missing_dependencies=""
+  local resolved
+  local seen
+
+  # Resolve dependencies recursively for the selected app
+  trace_dependencies_recursively() {
+    local app="$1"
+    local dependencies
+
+    if printf "%s\n" "$seen" | grep -qx "$app"; then
+      return
+    fi
+    seen="${seen:+$seen$'\n'}$app"
+    dependencies=$(load_dependencies "$app")
+
+    while IFS= read -r dep; do
+      [[ -n "$dep" ]] && trace_dependencies_recursively "$dep"
+    done <<<"$dependencies"
+
+    if ! printf "%s\n" "$resolved" | grep -qx "$app"; then
+      resolved="${resolved:+$resolved$'\n'}$app"
+    fi
+  }
 
   # Trace dependencies
   while IFS= read -r app; do
@@ -69,26 +68,25 @@ dependency_handler() {
     else
       printf "\n\033[1;32mIncluding missing dependencies...\033[0m\n"
     fi
+    RESOLVED_APPS="${resolved}"
   fi
 
   # Move init to the beginning of the resolved list if present
-  if printf "%s\n" "$resolved" | grep -q "^init$"; then
-    resolved=$(printf "init\n%s\n" "$(printf "%s\n" "$resolved" | grep -v "^init$")")
+  if printf "%s\n" "$RESOLVED_APPS" | grep -q "^init$"; then
+    RESOLVED_APPS=$(printf "init\n%s\n" "$(printf "%s\n" "$RESOLVED_APPS" | grep -v "^init$")")
   fi
 
   # Display resolved dependencies
-  printf "\n\033[1;32mResolved dependencies:\033[0m\n"
-  printf "%s\n" "$resolved"
-  printf "Do you want to proceed with the following install order? (yes/no): "
-  read -r choice
+  printf "\n\033[1;32mInstall order:\033[0m\n"
+  printf "%s\n" "$RESOLVED_APPS"
+  printf "\nDo you want to proceed with the following install order? (yes/no): "
 
+  # Ask for confirmation
+  read -r choice
   if [[ ! "$choice" =~ ^[Yy]([Ee][Ss])?$ ]]; then
     printf "\n\033[1;31mAborting installation...\033[0m\n"
-    printf "%s\n" "$"
     exit 1
   fi
-
-  RESOLVED_APPS="${resolved%$'\n'}"
 }
 
 # When executed directly

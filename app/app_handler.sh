@@ -13,7 +13,11 @@ list_apps() {
 select_app() {
   local apps="$1"
   local app="$2"
-  printf "%s\n%s\n" "$apps" "$app" | awk '!seen[$0]++'
+  if [ -z "$apps" ]; then
+    printf "%s\n" "$app"
+  else
+    printf "%s\n%s\n" "$apps" "$app" | awk '!seen[$0]++'
+  fi
 }
 
 # Remove the selected app from the list

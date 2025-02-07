@@ -4,8 +4,6 @@
 app_installer() {
   local apps="$1"
 
-  echo -e "$apps"
-
   echo "$apps" | while read -r app; do
     local app_script="$SHELLSMITH_WORKSPACE/apps/$app.sh"
     echo -e "\n\033[1;34mInstalling $app...\033[0m"
