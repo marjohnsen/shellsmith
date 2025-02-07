@@ -72,6 +72,11 @@ dependency_handler() {
     fi
   fi
 
+  # Move init to the beginning of the resolved list if present
+  if printf "%s\n" "$resolved" | grep -q "^init$"; then
+    resolved=$(printf "init\n%s\n" "$(printf "%s\n" "$resolved" | grep -v "^init$")")
+  fi
+
   RESOLVED_APPS="${resolved%$'\n'}"
 }
 
