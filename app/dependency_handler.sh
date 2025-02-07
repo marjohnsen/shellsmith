@@ -81,7 +81,7 @@ dependency_handler() {
   # Display resolved dependencies
   printf "\n\033[1;32mResolved dependencies:\033[0m\n"
   printf "%s\n" "$resolved"
-  printf "\nDo you want to proceed with the following install order? (yes/no): "
+  printf "Do you want to proceed with the following install order? (yes/no): "
   read -r choice
 
   if [[ ! "$choice" =~ ^[Yy]([Ee][Ss])?$ ]]; then
@@ -90,7 +90,7 @@ dependency_handler() {
     exit 1
   fi
 
-  RESOLVED_APPS="${resolved}"
+  RESOLVED_APPS="${resolved%$'\n'}"
 }
 
 # When executed directly
