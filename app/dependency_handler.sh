@@ -49,22 +49,23 @@ dependency_handler() {
   # Identify missing dependencies
   missing_dependencies=$(printf "%s\n" "$resolved" | grep -Fxv -f <(printf "%s\n" "$selected_apps") || true)
 
-  # Step 1: Ask if dependencies should be resolved
+  # Ask if dependencies should be resolved
   printf "\nWould you like to resolve dependencies for the selected apps? (yes/no): "
   read -r choice
-  if [[ "$choice" != "yes" && "$choice" != "y" ]]; then
+  if [[ ! "$choice" =~ ^[Yy]([Ee][Ss])?$ ]]; then
     printf "\n\033[1;31mUsing only selected apps, without resolving dependencies.\033[0m\n"
-    printf "%s\n" "$selected_apps"
+    printf "%s\n" "$"
+    RESOLVED_APPS="${selected_apps}"
     return
   fi
 
-  # Step 2: If dependencies are missing, ask if they should be added
-  if [[ -n "$missing_dependencies" ]]; then
+  # If dependencies are missing, ask if they should be added
+  if [[ -n "$missing_dependencies" && "$choice" =~ ^[Yy]([Ee][Ss])?$ ]]; then
     printf "\n\033[1;33mThe following dependencies are missing:\033[0m\n"
     printf "%s\n" "$missing_dependencies"
     printf "\nWould you like to include them? (yes/no): "
     read -r choice
-    if [[ "$choice" != "yes" && "$choice" != "y" ]]; then
+    if [[ ! "$choice" =~ ^[Yy]([Ee][Ss])?$ ]]; then
       printf "\n\033[1;32mIgnoring missing dependencies but resolving the rest...\033[0m\n"
       resolved=$(printf "%s\n" "$resolved" | grep -Fxv -f <(printf "%s\n" "$missing_dependencies"))
     else
@@ -77,7 +78,19 @@ dependency_handler() {
     resolved=$(printf "init\n%s\n" "$(printf "%s\n" "$resolved" | grep -v "^init$")")
   fi
 
-  RESOLVED_APPS="${resolved%$'\n'}"
+  # Display resolved dependencies
+  printf "\n\033[1;32mResolved dependencies:\033[0m\n"
+  printf "%s\n" "$resolved"
+  printf "\nDo you want to proceed with the following install order? (yes/no): "
+  read -r choice
+
+  if [[ ! "$choice" =~ ^[Yy]([Ee][Ss])?$ ]]; then
+    printf "\n\033[1;31mAborting installation...\033[0m\n"
+    printf "%s\n" "$"
+    exit 1
+  fi
+
+  RESOLVED_APPS="${resolved}"
 }
 
 # When executed directly

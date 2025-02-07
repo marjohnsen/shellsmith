@@ -86,7 +86,7 @@ app_handler() {
 # When executed directly
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   if [[ -z "$SHELLSMITH_WORKSPACE" ]]; then
-    read -r -p "Enter your ShellSmith workspace: " SHELLSMITH_WORKSPACE
+    read -r -p "Enter path to your ShellSmith workspace: " SHELLSMITH_WORKSPACE
     SHELLSMITH_WORKSPACE=$(cd "${SHELLSMITH_WORKSPACE/#\~/$HOME}" && pwd -P)
   fi
   app_handler

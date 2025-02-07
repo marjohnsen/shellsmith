@@ -23,8 +23,8 @@ update_and_commit() {
   if ! git -C "$SHELLSMITH_WORKSPACE" diff --quiet -- .shellsmith; then
     echo ""
     echo "The .shellsmith submodule has been updated to the latest version."
-    read -p "Would you like to commit the changes to your repository? (y/n): " choice
-    if [[ "$choice" =~ ^[Yy]$ ]]; then
+    read -p "Would you like to commit the changes to your repository? (yes/no): " choice
+    if [[ "$choice" =~ ^[Yy]([Ee][Ss])?$ ]]; then
       echo ""
       git -C "$SHELLSMITH_WORKSPACE" add .shellsmith
       git -C "$SHELLSMITH_WORKSPACE" commit -m "Update .shellsmith to the latest commit"

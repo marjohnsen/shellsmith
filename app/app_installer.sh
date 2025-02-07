@@ -4,6 +4,8 @@
 app_installer() {
   local apps="$1"
 
+  echo -e "$apps"
+
   echo "$apps" | while read -r app; do
     local app_script="$SHELLSMITH_WORKSPACE/apps/$app.sh"
     echo -e "\n\033[1;34mInstalling $app...\033[0m"
@@ -25,7 +27,7 @@ app_installer() {
 # When executed directly
 if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
   if [[ -z "$SHELLSMITH_WORKSPACE" ]]; then
-    read -r -p "Enter your ShellSmith workspace: " SHELLSMITH_WORKSPACE
+    read -r -p "Enter path to your ShellSmith workspace: " SHELLSMITH_WORKSPACE
     SHELLSMITH_WORKSPACE=$(cd "${SHELLSMITH_WORKSPACE/#\~/$HOME}" && pwd -P)
   fi
   app_installer "$*"
