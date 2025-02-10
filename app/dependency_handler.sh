@@ -51,22 +51,25 @@ dependency_handler() {
   # Ask if dependencies should be resolved
   printf "\nWould you like to resolve dependencies for the selected apps? (yes/no): "
   read -r choice
+  # if no, use only selected apps
   if [[ ! "$choice" =~ ^[Yy]([Ee][Ss])?$ ]]; then
-    printf "\n\033[1;31mUsing only selected apps, without resolving dependencies.\033[0m\n"
+    printf "\n\033[1;33mContinue without resolving dependencies..\033[0m\n"
     RESOLVED_APPS="${selected_apps}"
-  fi
-
-  # If dependencies are missing, ask if they should be added
-  if [[ -n "$missing_dependencies" && "$choice" =~ ^[Yy]([Ee][Ss])?$ ]]; then
+  # if yes and no missing dependencies, use resolved apps
+  elif [[ -z "$missing_dependencies" ]]; then
+    printf "\n\033[1;33mNo missing dependencies, resolving selected..\033[0m\n"
+    RESOLVED_APPS="${resolved}"
+  # if yes and missing dependencies, ask if they should be added
+  elif [[ -n "$missing_dependencies" ]]; then
     printf "\n\033[1;33mThe following dependencies are missing:\033[0m\n"
     printf "%s\n" "$missing_dependencies"
     printf "\nWould you like to include them? (yes/no): "
     read -r choice
     if [[ ! "$choice" =~ ^[Yy]([Ee][Ss])?$ ]]; then
-      printf "\n\033[1;32mIgnoring missing dependencies but resolving the rest...\033[0m\n"
+      printf "\n\033[1;33mIgnoring missing dependencies, resolving selected..\033[0m\n"
       resolved=$(printf "%s\n" "$resolved" | grep -Fxv -f <(printf "%s\n" "$missing_dependencies"))
     else
-      printf "\n\033[1;32mIncluding missing dependencies...\033[0m\n"
+      printf "\n\033[1;33mIncluding missing dependencies, resolving all..\033[0m\n"
     fi
     RESOLVED_APPS="${resolved}"
   fi

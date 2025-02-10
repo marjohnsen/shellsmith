@@ -8,25 +8,27 @@ safe_symlink() {
     while true; do
       read -p "File $dest exists. Overwrite? [y/n/a]: " choice
       case "$choice" in
-      y | Y)
+      ^[Yy]([Ee][Ss])?$)
         rm -rf "$dest"
         ln -s "$source" "$dest"
+        echo "Overwritten: '$dest'"
         break
         ;;
-      n | N)
-        echo "Skipping $dest."
+      ^[Nn]([Oo])?$)
+        echo "Not overwritten: '$dest'"
         return 0
         ;;
-      a | A)
-        echo "Aborting installation."
+      ^[Aa]([Bb][Oo][Rr][Tt])?$)
+        echo "Aborted."
         exit 1
         ;;
       *)
-        echo "Invalid choice. Please enter y (yes), n (no), or a (abort)."
+        echo "Invalid choice. Use [y/n/a]."
         ;;
       esac
     done
   else
     ln -s "$source" "$dest"
+    echo "Created: '$dest' -> '$source'"
   fi
 }
