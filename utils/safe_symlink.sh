@@ -6,26 +6,21 @@ safe_symlink() {
 
   if [ -e "$dest" ] || [ -L "$dest" ]; then
     while true; do
-      read -p "File $dest exists. Overwrite? [y/n/a]: " choice
-      case "$choice" in
-      ^[Yy]([Ee][Ss])?$)
+      read -r -p "File $dest exists. Overwrite? [y/n/a]: " choice </dev/tty
+      if [[ "$choice" =~ ^[Yy]([Ee][Ss])?$ ]]; then
         rm -rf "$dest"
         ln -s "$source" "$dest"
         echo "Overwritten: '$dest'"
         break
-        ;;
-      ^[Nn]([Oo])?$)
+      elif [[ "$choice" =~ ^[Nn]([Oo])?$ ]]; then
         echo "Not overwritten: '$dest'"
         return 0
-        ;;
-      ^[Aa]([Bb][Oo][Rr][Tt])?$)
+      elif [[ "$choice" =~ ^[Aa]([Bb][Oo][Rr][Tt])?$ ]]; then
         echo "Aborted."
         exit 1
-        ;;
-      *)
+      else
         echo "Invalid choice. Use [y/n/a]."
-        ;;
-      esac
+      fi
     done
   else
     ln -s "$source" "$dest"
