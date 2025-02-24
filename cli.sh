@@ -26,13 +26,15 @@ update_and_commit() {
 
   # Update the ShellSmith submodule if target is "shellsmith" or "all"
   if [ "$target" == "shellsmith" ] || [ "$target" == "all" ]; then
+    echo ""
     echo "Updating ShellSmith in $SHELLSMITH_WORKSPACE..."
     echo ""
     if git -C "$SHELLSMITH_WORKSPACE" submodule update --remote --recursive .shellsmith; then
       if ! git -C "$SHELLSMITH_WORKSPACE" diff --quiet -- .shellsmith; then
         git -C "$SHELLSMITH_WORKSPACE" add .shellsmith
         git -C "$SHELLSMITH_WORKSPACE" commit -m "Update .shellsmith to the latest commit"
-        echo "ShellSmith updated successfully."
+      else
+        echo "ShellSmith is already up to date."
       fi
     else
       echo "Failed to update ShellSmith."
@@ -45,9 +47,7 @@ update_and_commit() {
     echo ""
     echo "Updating common workspace in $SHELLSMITH_WORKSPACE..."
     echo ""
-    if git -C "$SHELLSMITH_WORKSPACE" subtree pull --prefix=common/ . common; then
-      echo "Common workspace updated successfully."
-    else
+    if ! git -C "$SHELLSMITH_WORKSPACE" subtree pull --prefix=common/ . common; then
       echo "Failed to update common workspace."
       exit 1
     fi
