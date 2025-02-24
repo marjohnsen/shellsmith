@@ -38,7 +38,7 @@ update_common_workspace() {
     echo ""
     echo "Pushing changes from to the common branch..."
     echo ""
-    if ! git -C "$SHELLSMITH_WORKSPACE" subtree push --prefix=common origin common; then
+    if ! git -C "$SHELLSMITH_WORKSPACE" subtree push --prefix=common origin origin/common; then
       echo "Failed to push common workspace."
       exit 1
     fi
@@ -47,7 +47,7 @@ update_common_workspace() {
     echo ""
     echo "Pulling changes from the common branch..."
     echo ""
-    if ! git -C "$SHELLSMITH_WORKSPACE" subtree pull --prefix=common/ . common; then
+    if ! git -C "$SHELLSMITH_WORKSPACE" subtree pull --prefix=common/ . origin/common; then
       echo "Failed to pull common workspace."
       exit 1
     fi
