@@ -7,9 +7,9 @@ show_help() {
   echo "  run               Run ShellSmith"
   echo "  workspace         Open ShellSmith workspace"
   echo "  update            Update the ShellSmith submodule."
-  echo "  common <option>      Update common workspace. Options:"
-  echo "                      push  - Push changes from main/common to the common branch."
-  echo "                      pull  - Pull changes from the common branch into main/common."
+  echo "  common <option>   Update common workspace. Options:"
+  echo "                      push - Push changes from the common/ folder into the common branch."
+  echo "                      pull - Pull changes from the common branch into the common/ folder."
   echo "  help              Display this help message"
   echo ""
 }
