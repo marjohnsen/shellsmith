@@ -4,46 +4,52 @@ show_help() {
   echo "Usage: $(basename "$0") <command> [args...]"
   echo ""
   echo "Commands:"
-  echo "  run                   Run ShellSmith"
-  echo "  workspace             Go-to ShellSmith workspace"
-  echo "  update                Update ShellSmith"
-  echo "  help                  Display this help message"
+  echo "  run               Run ShellSmith"
+  echo "  workspace         Open ShellSmith workspace"
+  echo "  update [target]   Update ShellSmith components."
+  echo "                    Targets:"
+  echo "                       all          Update all."
+  echo "                       shellsmith   Update only the ShellSmith submodule."
+  echo "                       common       Update only the common workspace subtree."
+  echo "  help              Display this help message"
   echo ""
 }
 
 update_and_commit() {
-  echo "Updating the .shellsmith submodule in $SHELLSMITH_WORKSPACE..."
-  echo ""
-
-  if ! git -C "$SHELLSMITH_WORKSPACE" submodule update --remote --recursive .shellsmith; then
-    echo "Failed to update the .shellsmith submodule. Please verify your configuration and try again."
-    return 1
+  target="$1"
+  # Default to "all" if no target is specified.
+  if [ -z "$target" ]; then
+    target="all"
   fi
 
-  if ! git -C "$SHELLSMITH_WORKSPACE" diff --quiet -- .shellsmith; then
+  # Update the ShellSmith submodule if target is "shellsmith" or "all"
+  if [ "$target" == "shellsmith" ] || [ "$target" == "all" ]; then
+    echo "Updating ShellSmith in $SHELLSMITH_WORKSPACE..."
     echo ""
-    echo "The .shellsmith submodule has been updated to the latest version."
-    read -p "Would you like to commit the changes to your repository? (yes/no): " choice
-    if [[ "$choice" =~ ^[Yy]([Ee][Ss])?$ ]]; then
-      echo ""
-      git -C "$SHELLSMITH_WORKSPACE" add .shellsmith
-      git -C "$SHELLSMITH_WORKSPACE" commit -m "Update .shellsmith to the latest commit"
-      echo ""
-      echo "Changes have been successfully committed to your workspace repository."
+    if git -C "$SHELLSMITH_WORKSPACE" submodule update --remote --recursive .shellsmith; then
+      if ! git -C "$SHELLSMITH_WORKSPACE" diff --quiet -- .shellsmith; then
+        git -C "$SHELLSMITH_WORKSPACE" add .shellsmith
+        git -C "$SHELLSMITH_WORKSPACE" commit -m "Update .shellsmith to the latest commit"
+        echo "ShellSmith updated successfully."
+      fi
     else
-      echo "Update completed, but changes were not committed."
+      echo "Failed to update ShellSmith."
+      exit 1
     fi
-  else
-    echo "The .shellsmith submodule is already up to date. No changes detected."
   fi
-}
 
-go_to_workspace() {
-  cd "$SHELLSMITH_WORKSPACE" || {
-    echo "Error: Unable to change directory to $SHELLSMITH_WORKSPACE" >&2
-    exit 1
-  }
-  $SHELL
+  # Update the common subtree if target is "common" or "all"
+  if [ "$target" == "common" ] || [ "$target" == "all" ]; then
+    echo ""
+    echo "Updating common workspace in $SHELLSMITH_WORKSPACE..."
+    echo ""
+    if git -C "$SHELLSMITH_WORKSPACE" subtree pull --prefix=common/ . common; then
+      echo "Common subtree updated successfully."
+    else
+      echo "Failed to update common subtree."
+      exit 1
+    fi
+  fi
 }
 
 if [[ $# -lt 1 ]]; then
@@ -59,7 +65,7 @@ run)
   "$SHELLSMITH_ROOT/app.sh"
   ;;
 update)
-  update_and_commit
+  update_and_commit "$@"
   ;;
 workspace)
   go_to_workspace
