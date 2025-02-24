@@ -17,9 +17,11 @@ show_help() {
 
 update_and_commit() {
   target="$1"
-  # Default to "all" if no target is specified.
+
+  # Show help if target is not provided
   if [ -z "$target" ]; then
-    target="all"
+    show_help
+    exit 1
   fi
 
   # Update the ShellSmith submodule if target is "shellsmith" or "all"
@@ -44,9 +46,9 @@ update_and_commit() {
     echo "Updating common workspace in $SHELLSMITH_WORKSPACE..."
     echo ""
     if git -C "$SHELLSMITH_WORKSPACE" subtree pull --prefix=common/ . common; then
-      echo "Common subtree updated successfully."
+      echo "Common workspace updated successfully."
     else
-      echo "Failed to update common subtree."
+      echo "Failed to update common workspace."
       exit 1
     fi
   fi
