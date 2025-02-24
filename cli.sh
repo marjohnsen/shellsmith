@@ -6,52 +6,57 @@ show_help() {
   echo "Commands:"
   echo "  run               Run ShellSmith"
   echo "  workspace         Open ShellSmith workspace"
-  echo "  update <target>   Update ShellSmith components."
-  echo "                    Targets:"
-  echo "                       all          Update all."
-  echo "                       shellsmith   Update only the ShellSmith submodule."
-  echo "                       common       Update only the common workspace subtree."
+  echo "  update            Update the ShellSmith submodule."
+  echo "  common <option>      Update common workspace. Options:"
+  echo "                      push  - Push changes from main/common to the common branch."
+  echo "                      pull  - Pull changes from the common branch into main/common."
   echo "  help              Display this help message"
   echo ""
 }
 
-update_and_commit() {
-  target="$1"
-
-  # Show help if target is not provided
-  if [ -z "$target" ]; then
-    show_help
+update_shellsmith() {
+  echo ""
+  echo "Updating ShellSmith in $SHELLSMITH_WORKSPACE..."
+  echo ""
+  if git -C "$SHELLSMITH_WORKSPACE" submodule update --remote --recursive .shellsmith; then
+    if ! git -C "$SHELLSMITH_WORKSPACE" diff --quiet -- .shellsmith; then
+      git -C "$SHELLSMITH_WORKSPACE" add .shellsmith
+      git -C "$SHELLSMITH_WORKSPACE" commit -m "Update .shellsmith to the latest commit"
+    else
+      echo "ShellSmith submodule is already up to date."
+    fi
+  else
+    echo "Failed to update ShellSmith submodule."
     exit 1
   fi
+}
 
-  # Update the ShellSmith submodule if target is "shellsmith" or "all"
-  if [ "$target" == "shellsmith" ] || [ "$target" == "all" ]; then
+update_common_workspace() {
+  local action="$1"
+  case "$action" in
+  push)
     echo ""
-    echo "Updating ShellSmith in $SHELLSMITH_WORKSPACE..."
+    echo "Pushing changes from main/common to the common branch..."
     echo ""
-    if git -C "$SHELLSMITH_WORKSPACE" submodule update --remote --recursive .shellsmith; then
-      if ! git -C "$SHELLSMITH_WORKSPACE" diff --quiet -- .shellsmith; then
-        git -C "$SHELLSMITH_WORKSPACE" add .shellsmith
-        git -C "$SHELLSMITH_WORKSPACE" commit -m "Update .shellsmith to the latest commit"
-      else
-        echo "ShellSmith is already up to date."
-      fi
-    else
-      echo "Failed to update ShellSmith."
+    if ! git -C "$SHELLSMITH_WORKSPACE" subtree push --prefix=common origin common; then
+      echo "Failed to push common workspace."
       exit 1
     fi
-  fi
-
-  # Update the common subtree if target is "common" or "all"
-  if [ "$target" == "common" ] || [ "$target" == "all" ]; then
+    ;;
+  pull)
     echo ""
-    echo "Updating common workspace in $SHELLSMITH_WORKSPACE..."
+    echo "Pulling changes from the common branch into main/common..."
     echo ""
     if ! git -C "$SHELLSMITH_WORKSPACE" subtree pull --prefix=common/ . common; then
-      echo "Failed to update common workspace."
+      echo "Failed to pull common workspace."
       exit 1
     fi
-  fi
+    ;;
+  *)
+    show_help
+    exit 1
+    ;;
+  esac
 }
 
 if [[ $# -lt 1 ]]; then
@@ -59,7 +64,7 @@ if [[ $# -lt 1 ]]; then
   exit 1
 fi
 
-command=$1
+command="$1"
 shift
 
 case "$command" in
@@ -67,7 +72,10 @@ run)
   "$SHELLSMITH_ROOT/app.sh"
   ;;
 update)
-  update_and_commit "$@"
+  update_shellsmith
+  ;;
+common)
+  update_common_workspace "$1"
   ;;
 workspace)
   go_to_workspace
@@ -76,7 +84,7 @@ help)
   show_help
   ;;
 *)
-  echo -e "\nUnknown command: $command\n"
+  echo "Unknown command: $command"
   show_help
   exit 1
   ;;
