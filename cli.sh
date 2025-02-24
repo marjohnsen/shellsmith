@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 
 show_help() {
-  echo "Usage: $(basename "$0") <command> [args...]"
+  echo "Usage: smith <command> [args...]"
   echo ""
   echo "Commands:"
   echo "  run               Run ShellSmith"
   echo "  workspace         Open ShellSmith workspace"
-  echo "  update [target]   Update ShellSmith components."
+  echo "  update <target>   Update ShellSmith components."
   echo "                    Targets:"
   echo "                       all          Update all."
   echo "                       shellsmith   Update only the ShellSmith submodule."
