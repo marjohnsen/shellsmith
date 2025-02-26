@@ -24,7 +24,7 @@ select_app() {
 deselect_app() {
   local apps="$1"
   local app="$2"
-  printf "%s\n" "$apps" | grep -vx "$app"
+  printf "%s\n" "$apps" | grep -vx "$app" || printf ""
 }
 
 # Display available and selected apps
