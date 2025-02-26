@@ -75,8 +75,10 @@ dependency_handler() {
   fi
 
   # Move init to the beginning of the resolved list if present
-  if printf "%s\n" "$RESOLVED_APPS" | grep -q "^init$"; then
-    RESOLVED_APPS=$(printf "init\n%s\n" "$(printf "%s\n" "$RESOLVED_APPS" | grep -v "^init$")")
+  if [ "$RESOLVED_APPS" != "init" ]; then
+    if printf "%s\n" "$RESOLVED_APPS" | grep -q "^init$"; then
+      RESOLVED_APPS=$(printf "init\n%s\n" "$(printf "%s\n" "$RESOLVED_APPS" | grep -v "^init$")")
+    fi
   fi
 
   # Display resolved dependencies
