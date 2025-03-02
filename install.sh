@@ -2,7 +2,7 @@
 
 set -e
 
-SHELLSMITH_LAUNCH="$HOME/.local/bin/smith"
+SHELLSMITH_LAUNCH="/usr/local/bin/smith"
 SHELLSMITH_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
 SHELLSMITH_WORKSPACE="$(cd "$SHELLSMITH_ROOT/../" && pwd -P)"
 SHELLSMITH_DOTFILES="$SHELLSMITH_WORKSPACE/dotfiles"
