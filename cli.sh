@@ -32,7 +32,6 @@ update_shellsmith() {
 }
 
 update_common_workspace() {
-n_workspace() {
   local action="$1"
   local ws="$SHELLSMITH_WORKSPACE"
 
