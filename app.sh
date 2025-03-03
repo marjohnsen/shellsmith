@@ -1,10 +1,6 @@
 #!/usr/bin/env bash
 
 set -e
-set -o pipefail
-set -E
-
-trap 'echo "[ERROR] Command \"${BASH_COMMAND}\" failed at line ${LINENO} in script ${BASH_SOURCE[0]}. Exiting..." >&2; exit 1' ERR
 
 SELECTED_APPS=""
 RESOLVED_APPS=""
