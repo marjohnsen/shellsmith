@@ -9,7 +9,7 @@ app_installer() {
     echo -e "\n\033[1;34mInstalling $app...\033[0m"
 
     if [[ -f "$app_script" ]]; then
-      if bash "$app_script"; then
+      if bash -e "$app_script"; then
         echo -e "\033[1;32m✔ $app installed successfully.\033[0m"
       else
         echo -e "\033[1;31m✘ Failed to install $app. Exiting...\033[0m"
