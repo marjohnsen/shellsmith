@@ -32,30 +32,28 @@ update_shellsmith() {
 }
 
 update_common_workspace() {
+n_workspace() {
   local action="$1"
+  local ws="$SHELLSMITH_WORKSPACE"
+
   case "$action" in
-  push)
-    echo ""
-    echo "Pushing changes from to the common branch..."
-    echo ""
-    if ! git -C "$SHELLSMITH_WORKSPACE" subtree push --prefix=common origin origin/common; then
-      echo "Failed to push common workspace."
-      exit 1
-    fi
-    ;;
-  pull)
-    echo ""
-    echo "Pulling changes from the common branch..."
-    echo ""
-    if ! git -C "$SHELLSMITH_WORKSPACE" subtree pull --prefix=common/ . origin/common; then
-      echo "Failed to pull common workspace."
-      exit 1
-    fi
-    ;;
-  *)
-    show_help
-    exit 1
-    ;;
+    push)
+      echo -e "\nPushing 'common/' to 'common' branch...\n"
+      git -C "$ws" subtree split --prefix=common -b common-split &&
+      git -C "$ws" push origin common-split:common &&
+      git -C "$ws" branch -D common-split &&
+      echo "Push successful." || { echo "Error: Push failed."; exit 1; }
+      ;;
+    
+    pull)
+      echo -e "\nPulling 'common' branch into 'common/'...\n"
+      git -C "$ws" subtree pull --prefix=common origin common &&
+      echo "Pull successful." || { echo "Error: Pull failed."; exit 1; }
+      ;;
+    
+    *)
+     show_help
+      ;;
   esac
 }
 
