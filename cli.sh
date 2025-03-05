@@ -46,8 +46,11 @@ workspace)
 
 update)
   case "$2" in
-  shellsmith | shared)
-    update_submodule "$2"
+  shellsmith)
+    update_submodule '.shellsmith'
+    ;;
+  shared)
+    update_submodule 'shared'
     ;;
   *)
     echo "Unknown update command: $1"
