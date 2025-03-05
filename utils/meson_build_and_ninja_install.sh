@@ -37,7 +37,7 @@ prepare_project() {
   [ "$project_type" == "main" ] && echo "$project_dir"
 }
 
-build_and_install() {
+meson_build_and_ninja_install() {
   local repos=("$@")
   local main_repo="${repos[0]}"
   local sub_repos=("${repos[@]:1}")
