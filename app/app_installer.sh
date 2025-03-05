@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 # Installs the apps passed as an argument
 app_installer() {
   local apps="$1"
