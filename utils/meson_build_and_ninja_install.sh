@@ -17,7 +17,7 @@ clone_repo() {
   local path="$3"
 
   git clone --recurse-submodules "$url" "$path" || error_exit "$path: Git clone failed"
-  [ -n "$tag" ] && git -C "$path" checkout "$tag" || error_exit "$path: Failed to checkout tag $tag"
+  if [ -n "$tag" ]; then git -C "$path" checkout "$tag" || error_exit "$path: Failed to checkout tag $tag"; fi
   git -C "$path" submodule update --init --recursive || error_exit "$path: Failed to update submodules"
 }
 
